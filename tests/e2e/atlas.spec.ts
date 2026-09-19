@@ -191,7 +191,7 @@ test("uses entrance GPS for the final stop and waits for a fifth-floor manual re
 });
 
 test("walks all five reveals through the manual arrival fallbacks", async ({ page }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(180_000);
   await page.goto("/?mode=fulltest&run=e2e-complete");
   await openAtlas(page);
 

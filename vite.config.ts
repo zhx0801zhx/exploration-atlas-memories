@@ -2,7 +2,7 @@ import path from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";
 import { sites } from "@openai/sites-vite-plugin";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 const buildId =
@@ -30,6 +30,30 @@ function sitesStaticWorker() {
       const serverDirectory = path.resolve(__dirname, "dist/server");
       await mkdir(serverDirectory, { recursive: true });
       await writeFile(path.join(serverDirectory, "index.js"), sitesWorkerSource, "utf8");
+    },
+  };
+}
+
+function githubPagesAssetBase(): Plugin {
+  let base = "/";
+  const rootAssetPattern = /(["'(])\/(assets|references|models|workers|mediapipe)\//g;
+
+  return {
+    name: "exploration-atlas-github-pages-asset-base",
+    apply: "build",
+    configResolved(config) {
+      base = config.base;
+    },
+    generateBundle(_options, bundle) {
+      if (base === "/") return;
+
+      for (const output of Object.values(bundle)) {
+        if (output.type === "chunk") {
+          output.code = output.code.replace(rootAssetPattern, `$1${base}$2/`);
+        } else if (typeof output.source === "string") {
+          output.source = output.source.replace(rootAssetPattern, `$1${base}$2/`);
+        }
+      }
     },
   };
 }
@@ -80,6 +104,7 @@ export default defineConfig({
       },
       devOptions: { enabled: true },
     }),
+    githubPagesAssetBase(),
     sites(),
     sitesStaticWorker(),
   ],
