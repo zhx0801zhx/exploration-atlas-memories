@@ -36,7 +36,10 @@ function sitesStaticWorker() {
 
 function githubPagesAssetBase(): Plugin {
   let base = "/";
-  const rootAssetPattern = /(["'(])\/(assets|references|models|workers|mediapipe)\//g;
+  const rootAssetPattern = /(["'(`])\/(assets|references|models|workers|mediapipe)\//g;
+
+  const rewriteRootAssets = (source: string) =>
+    source.replace(rootAssetPattern, `$1${base}$2/`);
 
   return {
     name: "exploration-atlas-github-pages-asset-base",
@@ -44,14 +47,22 @@ function githubPagesAssetBase(): Plugin {
     configResolved(config) {
       base = config.base;
     },
+    transform(code, id) {
+      if (base === "/" || id.includes("/node_modules/")) return null;
+      const cleanId = id.split("?", 1)[0];
+      if (!/\.(?:[cm]?[jt]sx?|css)$/.test(cleanId)) return null;
+
+      const transformed = rewriteRootAssets(code);
+      return transformed === code ? null : { code: transformed, map: null };
+    },
     generateBundle(_options, bundle) {
       if (base === "/") return;
 
       for (const output of Object.values(bundle)) {
         if (output.type === "chunk") {
-          output.code = output.code.replace(rootAssetPattern, `$1${base}$2/`);
+          output.code = rewriteRootAssets(output.code);
         } else if (typeof output.source === "string") {
-          output.source = output.source.replace(rootAssetPattern, `$1${base}$2/`);
+          output.source = rewriteRootAssets(output.source);
         }
       }
     },
