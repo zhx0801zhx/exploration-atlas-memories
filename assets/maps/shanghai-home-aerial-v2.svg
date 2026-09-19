@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="terrain" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#53614d"/><stop offset=".54" stop-color="#3f4d3e"/><stop offset="1" stop-color="#323a34"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#77786e"/><stop offset=".5" stop-color="#565b56"/><stop offset="1" stop-color="#858278"/></linearGradient>
+    <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#bbb5a7"/><stop offset=".45" stop-color="#817e75"/><stop offset="1" stop-color="#5e625e"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="180%" height="180%"><feDropShadow dx="8" dy="10" stdDeviation="5" flood-color="#10140f" flood-opacity=".72"/></filter>
+    <pattern id="lawns" width="26" height="22" patternUnits="userSpaceOnUse"><circle cx="5" cy="6" r="5" fill="#263b28"/><circle cx="18" cy="15" r="7" fill="#425c3a"/><circle cx="23" cy="2" r="3" fill="#68704a"/></pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#terrain)"/>
+  <path d="M0 0h800v500H0z" fill="url(#lawns)" opacity=".26"/>
+  <g opacity=".78" filter="url(#shadow)" fill="url(#roof)" stroke="#d1c9b5" stroke-opacity=".22">
+    <path d="m169 58 133-12 10 119-135 12z"/><path d="m654 53 103 4-4 127-104-4z"/>
+    <path d="m331 286 259-3 11 158-270 4z"/>
+    <path d="m355 303 62-2 2 49-63 2zm77-2h61v50h-61zm76 0 61 2-2 49-61-2zm-151 70h62v51h-62zm76 0h61v51h-61zm76 0h61v51h-61z" fill="#9b9890"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+    <path d="M-30 239C130 230 258 244 397 237S655 228 830 239" stroke="#272d2b" stroke-width="42"/>
+    <path d="M-30 239C130 230 258 244 397 237S655 228 830 239" stroke="url(#road)" stroke-width="35"/>
+    <path d="M-30 239C130 230 258 244 397 237S655 228 830 239" stroke="#d7cfae" stroke-opacity=".48" stroke-width="2" stroke-dasharray="18 22"/>
+    <path d="M118-30C134 90 112 160 123 238S111 390 128 530" stroke="#222927" stroke-width="30"/>
+    <path d="M118-30C134 90 112 160 123 238S111 390 128 530" stroke="#626862" stroke-width="23"/>
+    <path d="M643-30V530" stroke="#232a28" stroke-width="27"/><path d="M643-30V530" stroke="#646761" stroke-width="20"/>
+  </g>
+  <g fill="#355138" opacity=".9"><circle cx="188" cy="344" r="20"/><circle cx="214" cy="365" r="15"/><circle cx="279" cy="316" r="17"/><circle cx="614" cy="337" r="22"/><circle cx="623" cy="394" r="16"/><circle cx="712" cy="326" r="24"/><circle cx="73" cy="394" r="18"/></g>
+  <g fill="#91a26f" opacity=".46"><circle cx="183" cy="337" r="6"/><circle cx="275" cy="311" r="6"/><circle cx="608" cy="330" r="7"/><circle cx="707" cy="319" r="8"/></g>
+  <g transform="translate(400 261)" filter="url(#shadow)"><rect x="-37" y="-16" width="74" height="31" rx="4" fill="#4a4d48" stroke="#d6c89f" stroke-width="2"/><path d="M-25 14V-4h50v18M-32 18h64" fill="none" stroke="#efe2bd" stroke-width="2"/></g>
+  <path d="M0 0h800v500H0z" fill="none" stroke="#d0b978" stroke-opacity=".25" stroke-width="5"/>
+</svg>
