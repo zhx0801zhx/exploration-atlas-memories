@@ -24,16 +24,6 @@ async function openAtlas(page: Page) {
   await expect(page.locator(".map-stage")).toBeVisible({ timeout: 7_000 });
 }
 
-async function openCartographer(page: Page) {
-  const compass = page.getByRole("button", { name: "指南针" });
-  await compass.dispatchEvent("pointerdown", { pointerId: 1 });
-  await page.waitForTimeout(80);
-  await compass.dispatchEvent("pointerup", { pointerId: 1 });
-  await page.locator("input[inputmode='numeric']").fill("2468");
-  await page.getByRole("button", { name: "进入" }).click({ force: true });
-  await expect(page.getByRole("heading", { name: "制图人控制台" })).toBeVisible();
-}
-
 async function seedProgress(page: Page, databaseName: string, progress: Record<string, unknown>) {
   await page.waitForTimeout(250);
   await page.evaluate(async ({ databaseName, progress }) => {
@@ -123,10 +113,17 @@ test("automatically confirms a GPS arrival after two accurate north-gate samples
 
 test("shows the next exact clue before driving and keeps parking as an optional hint", async ({ page }) => {
   await page.goto("/?mode=fulltest&run=e2e-driving-clue");
-  await openAtlas(page);
-  await openCartographer(page);
-  await page.getByRole("button", { name: "强制过关" }).click();
-  await page.getByRole("button", { name: "带着这一页返回飞行扫帚" }).click();
+  await seedProgress(page, "exploration-atlas-fulltest-e2e-driving-clue", {
+    activeZoneId: "fulltest-home-start",
+    activeCheckpointId: "fulltest-home-dream",
+    completedCheckpointIds: ["fulltest-home-dream"],
+    photoAttempts: {},
+    capturedPhotoIds: [],
+    phase: "fog",
+    zoneStarted: false,
+    arrivedCheckpointIds: ["fulltest-home-dream"],
+  });
+  await page.reload();
   await expect(page.locator(".fog-content h2")).toHaveText("你最初的过去");
   await expect(page.getByText("解出地点后，请使用正常导航自驾前往。")).toBeVisible();
   await page.getByText("需要停车提示").click({ force: true });
@@ -193,23 +190,26 @@ test("uses entrance GPS for the final stop and waits for a fifth-floor manual re
   await expect(page.locator(".unlock-card h2")).toContainText("关于我想参与的未来");
 });
 
-test("walks all five reveals through the rehearsal fallback", async ({ page }) => {
+test("walks all five reveals through the manual arrival fallbacks", async ({ page }) => {
   test.setTimeout(90_000);
   await page.goto("/?mode=fulltest&run=e2e-complete");
   await openAtlas(page);
 
   const steps = [
-    { mystery: "第一枚未知坐标", reveal: "关于每个女孩子的梦想", transition: "zone" },
-    { mystery: "第二枚未知坐标", reveal: "关于我未曾参与的过去", transition: "zone" },
-    { mystery: "第三枚未知坐标", reveal: "关于我守护的童心", transition: "checkpoint" },
-    { mystery: "第四枚未知坐标", reveal: "关于我参与的现在", transition: "zone" },
-    { mystery: "第五枚未知坐标", reveal: "关于我想参与的未来", transition: "finale" },
+    { mystery: "第一枚未知坐标", arrive: "定位不准？我已在第一站入口", photo: "拍下第一站的回忆", reveal: "关于每个女孩子的梦想", transition: "zone", needsStart: true },
+    { mystery: "第二枚未知坐标", arrive: "定位不准？我已在第二站入口", photo: "拍下第二站的回忆", reveal: "关于我未曾参与的过去", transition: "zone", needsStart: true },
+    { mystery: "第三枚未知坐标", arrive: "定位不准？我已在第三站入口", photo: "拍下第三站的回忆", reveal: "关于我守护的童心", transition: "checkpoint", needsStart: true },
+    { mystery: "第四枚未知坐标", arrive: "我已走到相邻铺位", photo: "拍下第四站的回忆", reveal: "关于我参与的现在", transition: "zone", needsStart: false },
+    { mystery: "第五枚未知坐标", arrive: "定位不准？我已在第五站入口", photo: "我已到达 5 层，拍照留念", reveal: "关于我想参与的未来", transition: "finale", needsStart: true },
   ] as const;
 
   for (const step of steps) {
     await expect(page.locator(".quest-card h2")).toContainText(step.mystery);
-    await openCartographer(page);
-    await page.getByRole("button", { name: "强制过关" }).click({ force: true });
+    if (step.needsStart) {
+      await page.getByRole("button", { name: "飞行扫帚已抵达，开始探索" }).click();
+    }
+    await page.getByRole("button", { name: step.arrive }).click();
+    await saveMemoryPhoto(page, step.photo);
     await expect(page.locator(".unlock-card h2")).toContainText(step.reveal);
     if (step.transition === "checkpoint") {
       await page.getByRole("button", { name: "寻找下一枚未知坐标" }).evaluate((button: HTMLElement) => button.click());
@@ -224,8 +224,8 @@ test("walks all five reveals through the rehearsal fallback", async ({ page }) =
   }
 
   await expect(page.getByRole("heading", { name: "Exploration Completed" })).toBeVisible();
-  await expect(page.getByText("五页故事已经收好，新的故事从今晚开始。")).toBeVisible();
-  await expect(page.getByRole("button", { name: "重新彩排" })).toBeVisible();
+  await expect(page.getByText("5 段照片回忆已经被地图收藏。")).toBeVisible();
+  await expect(page.getByRole("button", { name: "回到第一页" })).toBeVisible();
 });
 
 test("keeps a formal finale clean and reset-free", async ({ page }) => {
@@ -242,7 +242,30 @@ test("keeps a formal finale clean and reset-free", async ({ page }) => {
   });
   await page.reload();
   await expect(page.getByRole("heading", { name: "Exploration Completed" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "重新彩排" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "回到第一页" })).toBeVisible();
+});
+
+test("uses the bottom-right compass to return from map and fog pages", async ({ page }) => {
+  await page.goto("/?run=e2e-return-home");
+  await openAtlas(page);
+  await page.getByRole("button", { name: "回到第一页" }).click();
+  await expect(page.getByRole("heading", { name: "Exploration Atlas" })).toBeVisible();
+
+  const databaseName = "exploration-atlas-formal-e2e-return-home";
+  await seedProgress(page, databaseName, {
+    activeZoneId: "home-start",
+    activeCheckpointId: "home-dream",
+    completedCheckpointIds: ["home-dream"],
+    photoAttempts: {},
+    capturedPhotoIds: [],
+    phase: "fog",
+    zoneStarted: false,
+    arrivedCheckpointIds: ["home-dream"],
+  });
+  await page.reload();
+  await expect(page.locator(".fog-screen")).toBeVisible();
+  await page.getByRole("button", { name: "回到第一页" }).click();
+  await expect(page.getByRole("heading", { name: "Exploration Atlas" })).toBeVisible();
 });
 
 test("opens every saved photo from the finale memory entrance", async ({ page }) => {
@@ -299,7 +322,7 @@ test("recovers safely from corrupted local progress", async ({ page }) => {
   await expect(page.getByRole("button", { name: "开启地图" })).toBeVisible();
 });
 
-test("location denial never blocks the cartographer fallback", async ({ page }) => {
+test("location denial never blocks the manual arrival fallback", async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "geolocation", {
       configurable: true,
@@ -317,9 +340,8 @@ test("location denial never blocks the cartographer fallback", async ({ page }) 
   await page.getByRole("button", { name: "飞行扫帚已抵达，开始探索" }).click();
   await page.getByRole("button", { name: "查看线索" }).click();
   await expect(page.getByText("定位权限没有开启")).toBeVisible();
-  await openCartographer(page);
-  await page.getByRole("button", { name: "强制过关" }).click({ force: true });
-  await expect(page.locator(".unlock-card h2")).toContainText("关于每个女孩子的梦想");
+  await page.getByRole("button", { name: "定位不准？我已在第一站入口" }).click();
+  await expect(page.getByRole("button", { name: "拍下第一站的回忆" })).toBeVisible();
 });
 
 test("keeps the revealed map draggable, zoomable and visually layered", async ({ page, context, baseURL }) => {

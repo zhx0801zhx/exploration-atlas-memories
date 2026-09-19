@@ -72,7 +72,6 @@ export function ExplorationApp({
     enabled: experienceConfig.optionalMedia.backgroundMusic.enabled,
     volume: experienceConfig.optionalMedia.backgroundMusic.volume,
   });
-  const isRehearsalFlow = demoMode || storageNamespace.startsWith("fulltest-");
   const storyInitialProgress = useMemo(() => createInitialProgress(storyZones), [storyZones]);
   const [progress, setProgress] = useState<StoryProgress>(() => structuredClone(storyInitialProgress));
   const [hydrated, setHydrated] = useState(false);
@@ -88,7 +87,6 @@ export function ExplorationApp({
   const [unlockOpen, setUnlockOpen] = useState(false);
   const [gmPinOpen, setGmPinOpen] = useState(false);
   const [gmOpen, setGmOpen] = useState(false);
-  const [compassHolding, setCompassHolding] = useState(false);
   const [questExpanded, setQuestExpanded] = useState(false);
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState(false);
@@ -116,7 +114,6 @@ export function ExplorationApp({
     camera: false,
     offlineReady: false,
   });
-  const compassTimer = useRef<number | null>(null);
   const introTimer = useRef<number | null>(null);
   const celebrationTimer = useRef<number | null>(null);
   const unlockTimer = useRef<number | null>(null);
@@ -512,33 +509,6 @@ export function ExplorationApp({
     setProgress((current) => ({ ...current, zoneStarted: true }));
   }
 
-  function beginCompassHold(event: React.PointerEvent<HTMLButtonElement>) {
-    event.preventDefault();
-    if (compassTimer.current) window.clearTimeout(compassTimer.current);
-    try {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    } catch {
-      // Safari may reject capture for a synthetic event; the hold timer still works.
-    }
-    setCompassHolding(true);
-    compassTimer.current = window.setTimeout(() => {
-      compassTimer.current = null;
-      setCompassHolding(false);
-      setGmPinOpen(true);
-      setPin("");
-      setPinError(false);
-    }, 3000);
-  }
-
-  function endCompassHold(event?: React.PointerEvent<HTMLButtonElement>) {
-    if (compassTimer.current) window.clearTimeout(compassTimer.current);
-    compassTimer.current = null;
-    setCompassHolding(false);
-    if (event?.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  }
-
   function submitPin(event: React.FormEvent) {
     event.preventDefault();
     if (pin === experienceConfig.cartographer.pin) {
@@ -579,15 +549,14 @@ export function ExplorationApp({
       )}
       <div className="rotate-notice"><div className="rotate-icon">↻</div><h1>请将 iPad 横过来</h1><p>地图需要一片更宽的羊皮纸。</p></div>
       <MagicAtmosphere phase={progress.phase} giftType={checkpoint.giftType} awake={progress.phase !== "intro"} />
-      {experienceConfig.cartographer.enabled && progress.phase !== "finale" && (
+      {progress.phase !== "finale" && (
         <button
-          className={`compass-secret ${compassHolding ? "is-holding" : ""}`}
-          aria-label="指南针"
-          onPointerDown={beginCompassHold}
-          onPointerUp={endCompassHold}
-          onPointerCancel={endCompassHold}
-          onContextMenu={(event) => event.preventDefault()}
-        ><span>N</span><i/><svg className="compass-hold-progress" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" pathLength="1"/></svg></button>
+          className="compass-secret compass-home"
+          type="button"
+          aria-label="回到第一页"
+          title="回到第一页"
+          onClick={() => void resetAll(true)}
+        ><span>N</span><i/></button>
       )}
       {demoMode && (
         <aside className={`demo-guide demo-guide-${progress.phase}`} aria-label="公开演示引导">
@@ -762,8 +731,8 @@ export function ExplorationApp({
             <button
               className="finale-home-button"
               type="button"
-              aria-label={isRehearsalFlow ? "重新彩排" : "回到第一页"}
-              title={isRehearsalFlow ? "重新彩排" : "回到第一页"}
+              aria-label="回到第一页"
+              title="回到第一页"
               onClick={() => void resetAll(true)}
             >
               <svg viewBox="0 0 40 40" aria-hidden="true">
