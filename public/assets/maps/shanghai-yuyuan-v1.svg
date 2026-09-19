@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs><radialGradient id="paper" cx="52%" cy="45%" r="72%"><stop offset="0" stop-color="#ead6a8"/><stop offset=".72" stop-color="#c49a61"/><stop offset="1" stop-color="#88603d"/></radialGradient><filter id="grain"><feTurbulence baseFrequency=".66" numOctaves="3" seed="11"/><feColorMatrix values="0 0 0 0 .2 0 0 0 0 .11 0 0 0 0 .05 0 0 0 .18 0"/></filter></defs>
+  <rect width="800" height="500" fill="url(#paper)"/><rect width="800" height="500" filter="url(#grain)" opacity=".35"/>
+  <g fill="none" stroke="#513425" stroke-linecap="round">
+    <path d="M429-20C416 96 441 214 429 360S439 446 425 520" stroke-width="25" opacity=".2"/><path d="M429-20C416 96 441 214 429 360S439 446 425 520" stroke="#ead8ad" stroke-width="17"/><path d="M429-20C416 96 441 214 429 360S439 446 425 520" stroke-width="1.3" stroke-dasharray="8 11"/>
+    <path d="M-20 349C166 339 285 358 430 351S650 344 825 353" stroke-width="24" opacity=".18"/><path d="M-20 349C166 339 285 358 430 351S650 344 825 353" stroke="#e6d2a2" stroke-width="16"/>
+    <path d="M-20 185H820" stroke-width="14" opacity=".14"/><path d="M-20 185H820" stroke="#dec694" stroke-width="8"/>
+    <path d="M208-20V520" stroke-width="12" opacity=".14"/><path d="M208-20V520" stroke="#dec694" stroke-width="7"/>
+  </g>
+  <g fill="#716047" opacity=".24" stroke="#493225"><rect x="235" y="210" width="145" height="102" rx="6"/><rect x="478" y="212" width="126" height="99" rx="6"/><rect x="492" y="374" width="168" height="88" rx="6"/><rect x="44" y="226" width="112" height="78" rx="5"/></g>
+  <g fill="#4a2f21" font-family="serif" letter-spacing="3"><text x="315" y="337" font-size="12">人 民 路</text><text x="407" y="75" font-size="11" transform="rotate(90 407 75)">河 南 南 路</text><text x="92" y="174" font-size="9">金 陵 东 路</text><text x="187" y="90" font-size="9" transform="rotate(90 187 90)">紫 金 路</text></g>
+  <g transform="translate(429 351)" fill="none" stroke="#563729" stroke-width="2"><circle r="29"/><circle r="20"/><path d="M0-29V29M-29 0h58M-20-20l40 40M20-20l-40 40"/></g>
+  <text x="429" y="397" text-anchor="middle" fill="#492e20" font-family="serif" font-size="9" letter-spacing="2">METRO GATE</text>
+</svg>

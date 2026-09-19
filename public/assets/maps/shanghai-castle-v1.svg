@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs><radialGradient id="paper" cx="52%" cy="43%" r="73%"><stop offset="0" stop-color="#ead6a8"/><stop offset=".72" stop-color="#c19760"/><stop offset="1" stop-color="#80573b"/></radialGradient><filter id="grain"><feTurbulence baseFrequency=".68" numOctaves="3" seed="19"/><feColorMatrix values="0 0 0 0 .2 0 0 0 0 .1 0 0 0 0 .05 0 0 0 .19 0"/></filter></defs>
+  <rect width="800" height="500" fill="url(#paper)"/><rect width="800" height="500" filter="url(#grain)" opacity=".36"/>
+  <path d="M748-20C724 97 759 191 735 282S766 426 728 520H820V-20Z" fill="#6d807d" opacity=".42"/><path d="M748-20C724 97 759 191 735 282S766 426 728 520" fill="none" stroke="#3e4e4b" stroke-width="3" opacity=".55"/>
+  <g fill="none" stroke="#503326" stroke-linecap="round">
+    <path d="M-20 252C185 247 332 260 431 252S617 243 744 250" stroke-width="25" opacity=".2"/><path d="M-20 252C185 247 332 260 431 252S617 243 744 250" stroke="#ead6a5" stroke-width="17"/><path d="M-20 252C185 247 332 260 431 252S617 243 744 250" stroke-width="1.4" stroke-dasharray="7 10"/>
+    <path d="M431-20C420 90 441 170 431 252S438 413 429 520" stroke-width="18" opacity=".17"/><path d="M431-20C420 90 441 170 431 252S438 413 429 520" stroke="#dfc794" stroke-width="11"/>
+    <path d="M148-20V520" stroke-width="13" opacity=".14"/><path d="M148-20V520" stroke="#dec28f" stroke-width="8"/>
+    <path d="M-20 365H735" stroke-width="12" opacity=".14"/><path d="M-20 365H735" stroke="#dec28f" stroke-width="7"/>
+  </g>
+  <g fill="#725e46" opacity=".24" stroke="#483024" stroke-width="1.2"><rect x="185" y="82" width="185" height="128" rx="7"/><rect x="469" y="70" width="180" height="142" rx="7"/><rect x="184" y="287" width="184" height="58" rx="6"/><rect x="477" y="286" width="166" height="59" rx="6"/></g>
+  <g fill="#4b3021" font-family="serif" letter-spacing="3"><text x="270" y="239" font-size="12">北 京 东 路</text><text x="410" y="72" font-size="10" transform="rotate(90 410 72)">圆 明 园 路</text><text x="126" y="82" font-size="9" transform="rotate(90 126 82)">四 川 中 路</text><text x="282" y="355" font-size="9">香 港 路</text></g>
+  <g transform="translate(431 252)" fill="none" stroke="#543529" stroke-width="2"><path d="M-47 35V-27l17-18 16 18 15-18 16 18 15-18 17 18v62z"/><path d="M-34 35V7h20v28M13 35V7h20v28M-3 35V-7h17v42M-47-27h96"/><path d="M-55 35h112"/></g>
+  <text x="431" y="307" text-anchor="middle" fill="#472d20" font-family="serif" font-size="9" letter-spacing="2">THE LAST GATE</text>
+</svg>
