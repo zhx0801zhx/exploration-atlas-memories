@@ -28,7 +28,9 @@ const illustratedMapAssets: Partial<Record<ExplorationZone["mapKind"], string>> 
 
 function publicAssetUrl(asset?: string) {
   if (!asset || !asset.startsWith("/")) return asset;
-  return `${import.meta.env.BASE_URL}${asset.replace(/^\/+/, "")}`;
+  const base = import.meta.env.BASE_URL;
+  if (base === "/" || asset.startsWith(base)) return asset;
+  return `${base}${asset.replace(/^\/+/, "")}`;
 }
 
 function pendingCoordinateCopy(count: number) {
@@ -307,8 +309,11 @@ export function MapCanvas({
     ? zone.subtitle
     : concealedSubtitle;
   const illustratedMap = publicAssetUrl(zone.illustratedMapAsset ?? illustratedMapAssets[zone.mapKind]);
+  const [loadedAsset, setLoadedAsset] = useState<string | null>(null);
   const [failedAsset, setFailedAsset] = useState<string | null>(null);
-  const hasIllustratedBase = Boolean(illustratedMap && failedAsset !== illustratedMap);
+  const hasIllustratedBase = Boolean(
+    illustratedMap && loadedAsset === illustratedMap && failedAsset !== illustratedMap,
+  );
   const startMapPoint = useMemo(
     () => projectPositionToMap(zone.routeGeo[0] ?? zone.center, zone, checkpoint),
     [zone, checkpoint],
@@ -447,6 +452,7 @@ export function MapCanvas({
     <div
       className={`map-stage ${arrived ? "is-revealed" : "is-concealed"}`}
       data-concealed={arrived ? "false" : "true"}
+      data-map-base={hasIllustratedBase ? "offline-illustrated" : failedAsset === illustratedMap ? "line-art" : "loading"}
       aria-label={arrived ? `${displayedTitle} 活点地图` : "被云雾封印的未知地图"}
       onClick={onMapFocus}
     >
@@ -493,6 +499,10 @@ export function MapCanvas({
               width="804"
               height="504"
               preserveAspectRatio="none"
+              onLoad={() => {
+                setLoadedAsset(illustratedMap);
+                setFailedAsset((current) => current === illustratedMap ? null : current);
+              }}
               onError={() => setFailedAsset(illustratedMap)}
             />
           )}

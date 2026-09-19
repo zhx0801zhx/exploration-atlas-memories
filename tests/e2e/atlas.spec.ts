@@ -104,6 +104,7 @@ test("automatically confirms a GPS arrival after two accurate north-gate samples
   await context.setGeolocation({ latitude: 31.16635, longitude: 121.50055, accuracy: 13 });
   await expect(page.getByRole("button", { name: "拍下第一站的回忆" })).toBeVisible();
   await expect(page.locator(".map-stage")).toHaveAttribute("data-concealed", "false");
+  await expect(page.locator(".map-stage")).toHaveAttribute("data-map-base", "offline-illustrated");
   await expect(page.locator(".revealed-map-labels")).toBeVisible();
   await expect(page.locator(".route-path:not(.route-path-aura)")).toHaveCount(1);
   await expect(page.locator(".goal-point")).toHaveCount(1);
@@ -382,7 +383,13 @@ test("stores the complete private atlas for offline use", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Exploration Atlas" })).toBeVisible();
   const cacheNames = await page.evaluate(() => caches.keys());
   expect(cacheNames.some((name) => name.startsWith("exploration-atlas-"))).toBe(true);
-  expect(await page.evaluate(async () => Boolean(
-    await caches.match("/assets/maps/shanghai-home-handdrawn-v3.jpg"),
-  ))).toBe(true);
+  const offlineMaps = [
+    "/assets/maps/shanghai-home-handdrawn-v3.jpg",
+    "/assets/maps/shanghai-yuyuan-handdrawn-v3.jpg",
+    "/assets/maps/shanghai-shimao-handdrawn-v3.jpg",
+    "/assets/maps/shanghai-castle-handdrawn-v3.jpg",
+  ];
+  for (const map of offlineMaps) {
+    expect(await page.evaluate(async (asset) => Boolean(await caches.match(asset)), map)).toBe(true);
+  }
 });
